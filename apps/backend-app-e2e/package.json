@@ -1,0 +1,27 @@
+{
+  "name": "@hyperhire-projects/backend-app-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "backend-app-e2e",
+    "projectType": "application",
+    "implicitDependencies": [
+      "backend-app"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{workspaceRoot}/coverage/{e2eProjectRoot}"
+        ],
+        "options": {
+          "jestConfig": "apps/backend-app-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "backend-app:build"
+        ]
+      }
+    }
+  }
+}
