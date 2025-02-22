@@ -4,18 +4,24 @@
  */
 
 import { AppModule } from './app/app.module';
+import { AppService } from './app/app.service';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const appConfig = app.get(AppService).getAppConfig();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  const port = process.env.NEST_JS_PORT || 3000;
-  await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
-  );
+  const port = appConfig.port || 8081;
+  const host = appConfig.host || 'localhost';
+
+  app.listen(port, host, () => {
+    Logger.log(`Listening at http://${host}:${port}/${globalPrefix}`);
+  });
 }
 
 bootstrap();

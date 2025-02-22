@@ -1,0 +1,24 @@
+app:
+  name: 'My App'
+  version: '1.0.0'
+  description: 'A sample NestJS application'
+  port: '${NEST_APP_PORT}' # Read from .env
+  host: '${NEST_APP_HOST}'
+  env: '${NEST_APP_ENV}'
+  debug: '${NEST_APP_DEBUG}'
+  timezone: '${NEST_APP_TIMEZONE}'
+  locale: '${NEST_APP_LOCALE}'
+  fallback_locale: 'en'
+  fallback_timezone: 'UTC'
+  log: 'file'
+  global_prefix: '${NEST_APP_GLOBAL_PREFIX}'
+  log_level: '${NEST_APP_LOG_LEVEL}'
+  log_path: './logs/app.log'
+  log_max_files: 10
+  log_permission: '0644'
+database:
+  host: '${NEST_DB_HOST}'
+  port: '${NEST_DB_PORT}'
+  name: '${NEST_DB_DATABASE}'
+  user: '${NEST_DB_USER}'
+  password: '${NEST_DB_PASSWORD}'
