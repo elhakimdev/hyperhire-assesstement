@@ -12,7 +12,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', "debug", "verbose"],
+  });
   const appConfig = app.get(AppService).getAppConfig();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

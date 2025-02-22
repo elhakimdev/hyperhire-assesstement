@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "TreeMenu" (
+CREATE TABLE "tree_menu" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -9,8 +9,8 @@ CREATE TABLE "TreeMenu" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "TreeMenu_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "tree_menu_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey
-ALTER TABLE "TreeMenu" ADD CONSTRAINT "TreeMenu_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "TreeMenu"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "tree_menu" ADD CONSTRAINT "tree_menu_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "tree_menu"("id") ON DELETE SET NULL ON UPDATE CASCADE;
