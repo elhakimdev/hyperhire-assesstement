@@ -22,3 +22,5 @@ database:
   name: '${NEST_DB_DATABASE}'
   user: '${NEST_DB_USER}'
   password: '${NEST_DB_PASSWORD}'
+prisma:
+  db_url: '${NEST_DB_PRISMA_DATABASE_URL}'
