@@ -4,15 +4,22 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
+    "@nestjs/schematics": "^10.0.1",
     "@nx/js": "20.4.6",
-    "@swc-node/register": "~1.9.1",
-    "@swc/core": "~1.5.7",
-    "@swc/helpers": "~0.5.11",
+    "@nx/nest": "21.0.0-canary.20250206-8bd0bcd",
+    "@nx/next": "21.0.0-canary.20250206-8bd0bcd",
+    "@swc-node/register": "~1.9.2",
+    "@swc/core": "~1.5.29",
+    "@swc/helpers": "~0.5.15",
     "nx": "20.4.6",
-    "prettier": "^2.6.2",
-    "tslib": "^2.3.0",
-    "typescript": "~5.7.2"
+    "prettier": "^2.8.8",
+    "tslib": "^2.8.1",
+    "typescript": "~5.7.3"
+  },
+  "dependencies": {
+    "next": "~15.1.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }
