@@ -59,6 +59,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@base-ui-components/react": "1.0.0-alpha.6",
     "@faker-js/faker": "9.5.0",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "4.0.0",

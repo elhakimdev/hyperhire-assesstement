@@ -5,20 +5,36 @@ import { PrismaService } from "../../services/prisma/prisma.service";
 
 @Injectable()
 export class MenuService {
+  memo = new Map<string, any>(); // Memoization cache
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Get all menus hierarchically
    */
   async findAll() {
-    return this.prisma.treeMenu.findMany({
-      where: { parentId: null }, // Only fetch top-level menus
-      include: {
-        children: {
-          include: { children: true }, // Recursively fetch children
-        },
-      },
+    return this.findMenuWithChildren(null); // Start from root
+  }
+
+    /**
+   * Recursively fetch all menus and their children
+   */
+  async findMenuWithChildren(parentId: string | null = null): Promise<any[]> {
+    if (this.memo.has(parentId || 'root')) {
+      return this.memo.get(parentId || 'root'); // Return cached result
+    }
+
+    const menus = this.prisma.treeMenu.findMany({
+      where: { parentId },
+      include: { children: true }, // Fetch immediate children
     });
+
+    // Recursively fetch children
+    for (const menu of await menus) {
+      menu.children = await this.findMenuWithChildren(menu.id); // Fetch nested children
+    }
+
+    this.memo.set(parentId || 'root', menus); // Store in cache
+    return menus;
   }
 
   /**

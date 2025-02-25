@@ -1,39 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {PrismaClient} from "@prisma/client";
+import { accountManagementTree } from "./account-menus";
+import { financeServiceTree } from "./fin-service-menu";
+import { systemMenuTree } from "./system-menus";
 
 const prisma = new PrismaClient();
 
 const menuData = [
-  {
-    name: "System Management",
-    url: "/system",
-    children: [
-      {
-        name: "Users",
-        url: "/system/users",
-        children: [
-          { name: "User List", url: "/system/users/list" },
-          { name: "User Roles", url: "/system/users/roles" }
-        ]
-      },
-      {
-        name: "Roles",
-        url: "/system/roles",
-        children: [
-          { name: "Role List", url: "/system/roles/list" },
-          { name: "Role Permissions", url: "/system/roles/permissions" }
-        ]
-      },
-      {
-        name: "Settings",
-        url: "/system/settings",
-        children: [
-          { name: "General Settings", url: "/system/settings/general" },
-          { name: "Security Settings", url: "/system/settings/security" }
-        ]
-      }
-    ]
-  }
+  systemMenuTree,
+  accountManagementTree,
+  financeServiceTree,
 ];
 
 /**
