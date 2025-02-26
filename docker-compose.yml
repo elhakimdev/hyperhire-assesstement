@@ -19,7 +19,7 @@ services:
     command: [ "npx", "prisma", "migrate", "deploy" ]
   backend:
     build:
-      context: ./apps/backend
+      context: ./apps/backend-app
       dockerfile: dockerfile
     container_name: nestjs_backend
     depends_on:
@@ -28,7 +28,7 @@ services:
       - hyperhire_network
     volumes:
       - .:/apps  # ✅ Share monorepo so backend can access root Prisma client
-      - /apps/backend/node_modules  # ✅ Prevent overwriting node_modules
+      - /apps/backend-app/node_modules  # ✅ Prevent overwriting node_modules
     environment:
       NODE_ENV: production
       NEST_APP_PORT: ${NEST_APP_PORT}
@@ -50,14 +50,14 @@ services:
       - ${NEST_DB_PORT}:${NEST_DB_PORT}
   frontend:
     build:
-      context: ./apps/frontend
+      context: ./apps/frontend-app
       dockerfile: dockerfile
     container_name: frontend_app
     depends_on:
       - backend
     volumes:
       - .:/apps  # ✅ Share monorepo so backend can access root Prisma client
-      - /apps/frontend/node_modules  # ✅ Prevent overwriting node_modules
+      - /apps/frontend-app/node_modules  # ✅ Prevent overwriting node_modules
     networks:
       - hyperhire_network
     ports:
