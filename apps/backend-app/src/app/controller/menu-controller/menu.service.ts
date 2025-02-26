@@ -5,7 +5,6 @@ import { PrismaService } from "../../services/prisma/prisma.service";
 
 @Injectable()
 export class MenuService {
-  memo = new Map<string, any>(); // Memoization cache
   constructor(private readonly prisma: PrismaService) {}
 
   /**
@@ -15,25 +14,19 @@ export class MenuService {
     return this.findMenuWithChildren(null); // Start from root
   }
 
-    /**
+  /**
    * Recursively fetch all menus and their children
    */
   async findMenuWithChildren(parentId: string | null = null): Promise<any[]> {
-    if (this.memo.has(parentId || 'root')) {
-      return this.memo.get(parentId || 'root'); // Return cached result
-    }
-
-    const menus = this.prisma.treeMenu.findMany({
+    const menus = await this.prisma.treeMenu.findMany({
       where: { parentId },
       include: { children: true }, // Fetch immediate children
     });
 
-    // Recursively fetch children
-    for (const menu of await menus) {
+    for (const menu of menus) {
       menu.children = await this.findMenuWithChildren(menu.id); // Fetch nested children
     }
 
-    this.memo.set(parentId || 'root', menus); // Store in cache
     return menus;
   }
 
@@ -63,18 +56,25 @@ export class MenuService {
    * Create a menu item hierarchically
    */
   async create(data: { name: string; url?: string; parentId?: string }) {
+    let generatedUrl = data.url || "";
+
     if (data.parentId) {
-      const parentExists = await this.prisma.treeMenu.findUnique({
+      const parent = await this.prisma.treeMenu.findUnique({
         where: { id: data.parentId },
       });
 
-      if (!parentExists) {
+      if (!parent) {
         throw new NotFoundException("Parent menu not found");
       }
+
+      const slug = this.slugify(data.name);
+      generatedUrl = `${parent.url}/${slug}`;
+    } else {
+      generatedUrl = `/${this.slugify(data.name)}`;
     }
 
     return this.prisma.treeMenu.create({
-      data,
+      data: { ...data, url: generatedUrl },
     });
   }
 
@@ -93,7 +93,7 @@ export class MenuService {
    */
   async delete(id: string) {
     await this.prisma.treeMenu.deleteMany({
-      where: { parentId: id }, // Delete children first
+      where: { parentId: id },
     });
 
     return this.prisma.treeMenu.delete({
@@ -113,5 +113,16 @@ export class MenuService {
     );
 
     return this.prisma.$transaction(updates);
+  }
+
+  /**
+   * Helper function to convert a string into a slug
+   */
+  private slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
   }
 }
