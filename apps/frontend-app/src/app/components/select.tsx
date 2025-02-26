@@ -20,7 +20,7 @@ export function MenuSelect({
   return (
     <Select.Root value={value} onValueChange={onChange}>
       <Select.Trigger
-        className={`flex h-[52px] min-w-36 items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 ${className}`}
+        className={`flex h-[52px] min-w-36 w-full items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 ${className}`}
       >
         <Select.Value placeholder={value ?? placeholder} />
         <Select.Icon className="flex">
