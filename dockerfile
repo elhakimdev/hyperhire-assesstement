@@ -9,7 +9,7 @@ ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 
 # Set the working directory inside the container (monorepo root)
-WORKDIR /
+WORKDIR /app
 
 # Copy package.json and lock file for monorepo dependencies
 COPY package.json pnpm-lock.yaml ./

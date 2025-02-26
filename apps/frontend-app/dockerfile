@@ -2,19 +2,16 @@
 FROM node:latest
 
 # Set the working directory
-WORKDIR /apps/frontend
+WORKDIR /app/apps/frontend-app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# # Install dependencies
-# RUN npm install
-
-# # Install PM2 globally
-# RUN npm install -g pm2
+# Set environment to production
+ENV NODE_ENV=production
 
 # Copy the rest of the application code
-COPY . .
+COPY ./apps/frontend-app .
 
 # Build the application
 RUN pnpm build

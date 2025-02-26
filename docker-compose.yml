@@ -3,7 +3,7 @@ networks:
     driver: bridge
 
 services:
-  prisma:
+  monorepo:
     build:
       context: .
       dockerfile: ./dockerfile
@@ -19,16 +19,16 @@ services:
     command: [ "npx", "prisma", "migrate", "deploy" ]
   backend:
     build:
-      context: ./apps/backend-app
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./apps/backend-app/dockerfile
     container_name: nestjs_backend
     depends_on:
-      - prisma
+      - monorepo
     networks:
       - hyperhire_network
     volumes:
-      - .:/apps  # ✅ Share monorepo so backend can access root Prisma client
-      - /apps/backend-app/node_modules  # ✅ Prevent overwriting node_modules
+      - .:/app  # ✅ Share monorepo so backend can access root Prisma client
+      - /app/node_modules  # ✅ Prevent overwriting node_modules
     environment:
       NODE_ENV: production
       NEST_APP_PORT: ${NEST_APP_PORT}
@@ -47,17 +47,17 @@ services:
       NEST_DB_PASSWORD: ${NEST_DB_PASSWORD}
       NEST_DB_PRISMA_DATABASE_URL: ${NEST_DB_PRISMA_DATABASE_URL}
     ports:
-      - ${NEST_DB_PORT}:${NEST_DB_PORT}
+      - ${NEST_APP_PORT}:${NEST_APP_PORT}
   frontend:
     build:
-      context: ./apps/frontend-app
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./apps/backend-app/dockerfile
     container_name: frontend_app
     depends_on:
       - backend
     volumes:
-      - .:/apps  # ✅ Share monorepo so backend can access root Prisma client
-      - /apps/frontend-app/node_modules  # ✅ Prevent overwriting node_modules
+      - .:/app  # ✅ Share monorepo so backend can access root Prisma client
+      - /app/node_modules  # ✅ Prevent overwriting node_modules
     networks:
       - hyperhire_network
     ports:
