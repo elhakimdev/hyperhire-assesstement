@@ -1,0 +1,66 @@
+version: '3.8'
+
+networks:
+  hyperhire_network:
+    driver: bridge
+
+services:
+  prisma:
+    build:
+      context: .
+      dockerfile: ./dockerfile
+    container_name: prisma_migrator
+    environment:
+      - NODE_ENV: production
+      - NEST_DB_HOST: ${NEST_DB_HOST}
+      - NEST_DB_PORT: ${NEST_DB_PORT}
+      - NEST_DB_DATABASE: ${NEST_DB_DATABASE}
+      - NEST_DB_USER: ${NEST_DB_USER}
+      - NEST_DB_PASSWORD: ${NEST_DB_PASSWORD}
+      - NEST_DB_PRISMA_DATABASE_URL: ${NEST_DB_PRISMA_DATABASE_URL}
+    command: [ "npx", "prisma", "migrate", "deploy" ]
+  backend:
+    build:
+      context: ./app/backend
+      dockerfile: dockerfile
+    container_name: nestjs_backend
+    depends_on:
+      - prisma
+    networks:
+      - app_network
+    volumes:
+      - .:/app  # ✅ Share monorepo so backend can access root Prisma client
+      - /app/node_modules  # ✅ Prevent overwriting node_modules
+    environment:
+      NODE_ENV: production
+      NEST_APP_PORT: ${NEST_APP_PORT}
+      NEST_APP_HOST: ${NEST_APP_PORT}
+      NEST_APP_ENV: ${NEST_APP_ENV}
+      NEST_APP_DEBUG: ${NEST_APP_DEBUG}
+      NEST_APP_TIMEZONE: ${NEST_APP_TIMEZONE}
+      NEST_APP_LOCALE: ${NEST_APP_LOCALE}
+      NEST_APP_LOG_LEVEL: ${NEST_APP_LOCALE}
+      NEST_APP_GLOBAL_PREFIX: ${NEST_APP_GLOBAL_PREFIX}
+
+      NEST_DB_HOST: ${NEST_DB_HOST}
+      NEST_DB_PORT: ${NEST_DB_PORT}
+      NEST_DB_DATABASE: ${NEST_DB_DATABASE}
+      NEST_DB_USER: ${NEST_DB_USER}
+      NEST_DB_PASSWORD: ${NEST_DB_PASSWORD}
+      NEST_DB_PRISMA_DATABASE_URL: ${NEST_DB_PRISMA_DATABASE_URL}
+    ports:
+      - ${NEST_DB_PORT}:${NEST_DB_PORT}
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: dockerfile
+    container_name: frontend_app
+    depends_on:
+      - backend
+    volumes:
+      - .:/app  # ✅ Share monorepo so backend can access root Prisma client
+      - /app/node_modules  # ✅ Prevent overwriting node_modules
+    networks:
+      - app_network
+    ports:
+      - ${NEXT_JS_PORT}:${NEXT_JS_PORT}
