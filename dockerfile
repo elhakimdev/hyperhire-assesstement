@@ -1,28 +1,31 @@
-# Use the official Node.js image as the base image
-FROM node:18
+# Use the official Node.js image
+FROM node:latest
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app/root
+# Install pnpm globally
+RUN npm install -g pnpm --force
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Set the PNPM global bin directory in PATH
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
 
-# Set environment to production
-ENV NODE_ENV=production
+# Set the working directory inside the container (monorepo root)
+WORKDIR /
 
-# Install PM2 globally and production dependencies
-RUN npm install -g pm2 && npm install
+# Copy package.json and lock file for monorepo dependencies
+COPY package.json pnpm-lock.yaml ./
+
+# Install all dependencies in the monorepo
+RUN pnpm install --force
+
+# Install PM2 globally inside the monorepo
+RUN pnpm add -g pm2
 
 # Copy the entire monorepo (so Prisma can access the root)
-WORKDIR /usr/src/app
 COPY . .
 
-# Set Prisma path (assuming it's at the root)
-WORKDIR /usr/src/app/prisma
+# Run Prisma migrations
+RUN pnpm exec prisma generate
+RUN pnpm exec prisma migrate deploy
 
-# Generate Prisma client and run migrations
-RUN npx prisma generate
-RUN npx prisma migrate deploy
-
-# Command to run the application using PM2
-CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]
+# Do nothing—this image is just for dependency setup
+CMD ["sleep", "infinity"]
