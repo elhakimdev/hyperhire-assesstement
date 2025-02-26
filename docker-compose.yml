@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   hyperhire_network:
     driver: bridge
@@ -11,13 +9,13 @@ services:
       dockerfile: ./dockerfile
     container_name: prisma_migrator
     environment:
-      - NODE_ENV: production
-      - NEST_DB_HOST: ${NEST_DB_HOST}
-      - NEST_DB_PORT: ${NEST_DB_PORT}
-      - NEST_DB_DATABASE: ${NEST_DB_DATABASE}
-      - NEST_DB_USER: ${NEST_DB_USER}
-      - NEST_DB_PASSWORD: ${NEST_DB_PASSWORD}
-      - NEST_DB_PRISMA_DATABASE_URL: ${NEST_DB_PRISMA_DATABASE_URL}
+      NODE_ENV: production
+      NEST_DB_HOST: ${NEST_DB_HOST}
+      NEST_DB_PORT: ${NEST_DB_PORT}
+      NEST_DB_DATABASE: ${NEST_DB_DATABASE}
+      NEST_DB_USER: ${NEST_DB_USER}
+      NEST_DB_PASSWORD: ${NEST_DB_PASSWORD}
+      NEST_DB_PRISMA_DATABASE_URL: ${NEST_DB_PRISMA_DATABASE_URL}
     command: [ "npx", "prisma", "migrate", "deploy" ]
   backend:
     build:
@@ -27,7 +25,7 @@ services:
     depends_on:
       - prisma
     networks:
-      - app_network
+      - hyperhire_network
     volumes:
       - .:/app  # ✅ Share monorepo so backend can access root Prisma client
       - /app/node_modules  # ✅ Prevent overwriting node_modules
@@ -61,6 +59,6 @@ services:
       - .:/app  # ✅ Share monorepo so backend can access root Prisma client
       - /app/node_modules  # ✅ Prevent overwriting node_modules
     networks:
-      - app_network
+      - hyperhire_network
     ports:
       - ${NEXT_JS_PORT}:${NEXT_JS_PORT}
