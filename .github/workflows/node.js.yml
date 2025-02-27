@@ -36,7 +36,7 @@ jobs:
         run: pnpm exec nx build backend-app --output-path=artifacts/app/backend --parallel --skip-nx-cache
 
       - name: Build backend
-        run: pnpm exec nx build backend-app --output-path=artifacts/app/backend --parallel --skip-nx-cache
+        run: pnpm exec nx build backend-app --output-path=artifacts/app/frontend --parallel --skip-nx-cache
 
       - name: Commit Built Files
         env:
