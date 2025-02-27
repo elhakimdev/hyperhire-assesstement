@@ -35,9 +35,6 @@ jobs:
       - name: Cleanup Artifacts
         run: find . -type d -name "artifacts" -exec rm -rf {} +
 
-      - name: Create Artifacts Directory
-        run: mkdir -p artifacts/apps/frontend-app artifacts/apps/backend-app
-      
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
 
@@ -45,10 +42,19 @@ jobs:
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
       
       - name: Move Backend Build Output
-        run: mv apps/backend-app/dist artifacts/apps/backend-app
+        run: mkdir -p artifacts/apps/backend-app && mv apps/backend-app/dist artifacts/apps/backend-app
       
       - name: Move Frontend Build Output
-        run: mv apps/frontend-app/.next artifacts/apps/frontend-app
+        run: mkdir -p artifacts/apps/frontend-app && mv apps/frontend-app/.next artifacts/apps/frontend-app
+      
+      - name: List Generated Artifacts
+        run: ls -R artifacts || echo "Artifacts folder is empty!"
+
+      - name: Show Git Status
+        run: git status
+
+      - name: Show Git Diff
+        run: git diff --stat
 
       - name: Commit Built Files
         env:
