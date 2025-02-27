@@ -41,19 +41,19 @@ jobs:
             echo "Removing existing artifacts..."
             rm -rf artifacts
           fi
-          mkdir -p artifacts/app --output-path=artifacts/app/backend
+          mkdir -p artifacts/apps
       
       - name: Build backend
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
         
       - name: Move Backend Build Output
-        run: mkdir -p artifacts/apps/backend-app && mv dist/apps/backend-app/* artifacts/apps/backend-app
+        run: mv apps/backend-app/dist artifacts/apps/backend-app
 
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
       
       - name: Move Frontend Build Output
-        run: mkdir -p artifacts/apps/frontend-app && mv apps/frontend-app/.next artifacts/apps/frontend-app
+        run: mv apps/frontend-app/.next artifacts/apps/frontend-app
 
       - name: Commit Built Files
         env:
