@@ -26,14 +26,14 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8  # Use the latest stable PNPM version
-          run_install: false  # Prevent automatic install
+          version: 8
+          run_install: false
 
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Cleanup Artifacts
-        run: find . -type d -name "artifacts" -exec rm -rf {} +
+        run: find . -type d -name "artifacts" -exec rm -rf {} + || true
 
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
@@ -42,19 +42,24 @@ jobs:
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
       
       - name: Move Backend Build Output
-        run: mkdir -p artifacts/apps/backend-app && mv ./apps/backend-app/dist ./artifacts/apps/backend-app
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
       
       - name: Move Frontend Build Output
-        run: mkdir -p artifacts/apps/frontend-app && mv ./apps/frontend-app/.next ./artifacts/apps/frontend-app
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/frontend-app
+          mv -v $GITHUB_WORKSPACE/apps/frontend-app/.next $GITHUB_WORKSPACE/artifacts/apps/frontend-app
       
+      
+      - name: Check if Artifacts Are Ignored
+        run: git check-ignore -v artifacts/* || echo "Artifacts are NOT ignored"
+
       - name: List Generated Artifacts
         run: ls -R artifacts || echo "Artifacts folder is empty!"
 
-      - name: Show Git Status
-        run: git status
-
-      - name: Show Git Diff
-        run: git diff --stat
+      - name: Show Git Status Before Commit
+        run: git status --short
 
       - name: Commit Built Files
         env:
@@ -62,6 +67,14 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@github.com"
-          git add .
-          git commit -m "ci: auto-commit built files [skip ci]" || echo "No changes to commit"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }} || echo "No changes to push"
+          
+          # Ensure artifacts are not ignored
+          git add -f artifacts/
+          
+          # Only commit if there are actual changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: auto-commit built files [skip ci]"
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+          fi
