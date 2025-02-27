@@ -51,16 +51,16 @@ jobs:
 
       - name: Move Prisma Client to Backend Artifact
         run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
-          cp -R node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma client found"
-          cp -R node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma
-          cp apps/backend-app/prisma/schema.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma/ || echo "No schema.prisma found"
+          mkdir -p artifacts/apps/backend-app/node_modules
+          cp -R node_modules/.pnpm/@prisma+client*/node_modules/@prisma artifacts/apps/backend-app/node_modules/ || echo "No @prisma client found"
+          cp -R node_modules/.prisma artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
+          mkdir -p artifacts/apps/backend-app/prisma
+          cp apps/backend-app/prisma/schema.prisma artifacts/apps/backend-app/prisma/ || echo "No schema.prisma found"
 
       - name: Regenerate Prisma Client in Backend Artifact
         run: |
-          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
-            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          if [ -d artifacts/apps/backend-app ]; then
+            cd artifacts/apps/backend-app
             pnpm exec prisma generate --schema=prisma/schema.prisma
           else
             echo "Skipping prisma generate: Backend artifact directory missing!"
