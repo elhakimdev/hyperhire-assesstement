@@ -39,7 +39,7 @@ jobs:
         run: pnpm add @prisma/client --filter backend-app
 
       - name: Generate Prisma Client
-        run: pnpm exec prisma generate --filter backend-app --schema=prisma/schema.prisma
+        run: pnpm exec prisma generate --schema=prisma/schema.prisma
 
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
