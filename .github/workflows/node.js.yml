@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensures proper commit history for Nx caching
+          fetch-depth: 0  # Pastikan history untuk Nx caching
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -34,57 +34,98 @@ jobs:
 
       - name: Cleanup Artifacts
         run: rm -rf artifacts || true
-      
-      - name: Install Prisma Client in Backend Before Build
+
+      # 🔹 Install Prisma Client sebelum build
+      - name: Install Prisma Client
         run: pnpm add @prisma/client --filter backend-app
 
+      # 🔹 Generate Prisma Client agar bisa digunakan dalam build
       - name: Generate Prisma Client
         run: pnpm exec prisma generate --schema=prisma/schema.prisma
 
+      # 🔹 Build Backend (Nest.js)
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
 
-      - name: Build Next.js App (SSR)
+      # 🔹 Build Frontend (Next.js)
+      - name: Build Next.js App (Frontend)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
 
+      # 🔹 Simpan hasil build backend
       - name: Move Backend Build Output
         run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
-          mv -v apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
-      
-      - name: Install Backend Production Dependencies in Artifacts
+          mkdir -p artifacts/apps/backend-app
+          mv -v apps/backend-app/dist artifacts/apps/backend-app
+          cp -R apps/backend-app/prisma artifacts/apps/backend-app/prisma
+
+      # 🔹 Install dependencies production di dalam artifacts (supaya Prisma Client tetap ada)
+      - name: Install Production Dependencies in Artifacts
         run: |
           cd artifacts/apps/backend-app
           pnpm install --prod
-      
+
+      # 🔹 Copy Prisma Client supaya tetap bisa diakses
+      - name: Ensure Prisma Client Exists in Artifact
+        run: |
+          mkdir -p artifacts/apps/backend-app/node_modules
+          cp -R node_modules/.pnpm artifacts/apps/backend-app/
+          cp -R node_modules/@prisma artifacts/apps/backend-app/node_modules/
+          cp -R node_modules/prisma artifacts/apps/backend-app/node_modules/
+
+      # 🔹 Pastikan Prisma Client benar-benar ada di artifacts
+      - name: Verify Prisma Client
+        run: ls -R artifacts/apps/backend-app/node_modules/@prisma || echo "Prisma Client missing!"
+
+      # 🔹 Simpan hasil build frontend
       - name: Move Frontend Build Output
         run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/frontend-app
-          mv -v apps/frontend-app/.next $GITHUB_WORKSPACE/artifacts/apps/frontend-app
+          mkdir -p artifacts/apps/frontend-app
+          mv -v apps/frontend-app/.next artifacts/apps/frontend-app
 
-      - name: Verify Artifacts Are Not Ignored
-        run: git check-ignore -v $GITHUB_WORKSPACE/artifacts/* || echo "Artifacts are NOT ignored"
+      # 🔹 Upload hasil build backend (backend siap deploy)
+      - name: Upload Backend Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: artifacts/apps/backend-app
 
-      - name: List Generated Artifacts
-        run: ls -R artifacts || echo "Artifacts folder is empty!"
+      # 🔹 Upload hasil build frontend (frontend siap deploy)
+      - name: Upload Frontend Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: artifacts/apps/frontend-app
 
-      - name: Show Git Status Before Commit
-        run: git status --short
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-      - name: Commit Built Files
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@github.com"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-          # Ensure artifacts are not ignored
-          git add -f $GITHUB_WORKSPACE/artifacts/ || echo "No artifacts to add"
+      # 🔹 Download backend artifact untuk deploy
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build
+          path: artifacts/apps/backend-app
 
-          # Only commit if there are actual changes
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "ci: auto-commit built files [skip ci]"
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
-          fi
+      # 🔹 Download frontend artifact untuk deploy
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: artifacts/apps/frontend-app
+
+      # 🔹 Pastikan Prisma Client masih ada setelah download
+      - name: Verify Prisma Client After Download
+        run: ls -R artifacts/apps/backend-app/node_modules/@prisma || echo "Prisma Client missing!"
+
+      # 🔹 Deploy Backend (contoh: Docker atau SSH)
+      - name: Deploy Backend
+        run: echo "Deploying backend..."
+
+      # 🔹 Deploy Frontend (contoh: Vercel atau S3)
+      - name: Deploy Frontend
+        run: echo "Deploying frontend..."
