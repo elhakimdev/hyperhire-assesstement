@@ -32,22 +32,28 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: List All Artifacts Before Cleanup
+        run: find . -type d -name "artifacts"
+
       - name: Cleanup Old Artifacts
         run: |
           if [ -d "artifacts" ]; then
             echo "Removing existing artifacts..."
             rm -rf artifacts
           fi
-          mkdir -p artifacts/app
+          mkdir -p artifacts/app --output-path=artifacts/app/backend
       
       - name: Build backend
-        run: pnpm exec nx build backend-app --output-path=artifacts/app/backend --parallel --skip-nx-cache
+        run: pnpm exec nx build backend-app --parallel --skip-nx-cache
+        
+      - name: Move Backend Build Output
+        run: mkdir -p artifacts/apps/backend-app && mv dist/apps/backend-app/* artifacts/apps/backend-app
 
       - name: Build Next.js App (SSR)
-        run: pnpm exec nx build frontend-app
-
-      - name: Move Build Output
-        run: mv apps/frontend-app/.next artifacts/app/frontend-app
+        run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
+      
+      - name: Move Frontend Build Output
+        run: mkdir -p artifacts/apps/frontend-app && mv apps/frontend-app/.next artifacts/apps/frontend-app
 
       - name: Commit Built Files
         env:
