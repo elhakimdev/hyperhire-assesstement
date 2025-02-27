@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm exec prisma generate
+        run: pnpm exec prisma generate --schema=prisma/schema.prisma
 
       - name: Cleanup Artifacts
         run: rm -rf artifacts || true
@@ -64,16 +64,16 @@ jobs:
           cp -R node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma client found"
           cp -R node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma
-          cp apps/backend-app/prisma/schema.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma/ || echo "No schema.prisma found"
+          cp -R $GITHUB_WORKSPACE/prisma/schema.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma/ || echo "No schema.prisma found"
 
-      - name: Regenerate Prisma Client in Backend Artifact
-        run: |
-          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
-            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
-            pnpm exec prisma generate --schema=prisma/schema.prisma
-          else
-            echo "Skipping prisma generate: Backend artifact directory missing!"
-          fi
+      # - name: Regenerate Prisma Client in Backend Artifact
+      #   run: |
+      #     if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
+      #       cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
+      #       pnpm exec prisma generate --schema=prisma/schema.prisma
+      #     else
+      #       echo "Skipping prisma generate: Backend artifact directory missing!"
+      #     fi
 
       - name: Move Frontend Build Output
         run: |
