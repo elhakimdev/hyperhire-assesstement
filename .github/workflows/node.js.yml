@@ -54,9 +54,11 @@ jobs:
       # 🔹 Simpan hasil build backend
       - name: Move Backend Build Output
         run: |
-          mkdir -p artifacts/apps/backend-app
-          mv -v apps/backend-app/dist artifacts/apps/backend-app
-          cp -R prisma artifacts/apps/backend-app/prisma
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
+          mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          cp -R $GITHUB_WORKSPACE/prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma
+          cp -R $GITHUB_WORKSPACE/node_modules $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
 
       # # 🔹 Install dependencies production di dalam artifacts (supaya Prisma Client tetap ada)
       # - name: Install Production Dependencies in Artifacts
@@ -70,16 +72,16 @@ jobs:
       #   NODE_PATH=$(pwd)/node_modules node dist/main.js
 
       # 🔹 Copy Node Modules Ke Backend Artifacts
-      - name: Ensure Prisma Client Exists in Artifact
-        run: |
-          mkdir -p artifacts/apps/backend-app/node_modules
-          cp -R node_modules/* artifacts/apps/backend-app/node_modules
+      # - name: Ensure Prisma Client Exists in Artifact
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
+      #     cp -R node_modules/* artifacts/apps/backend-app/node_modules
 
       # 🔹 Copy Node Modules Ke Frontend Artifacts
-      - name: Ensure Prisma Client Exists in Artifact
-        run: |
-          mkdir -p artifacts/apps/backend-app/node_modules
-          cp -R node_modules/* artifacts/apps/backend-app/node_modules
+      # - name: Ensure Prisma Client Exists in Artifact
+      #   run: |
+      #     mkdir -p artifacts/apps/backend-app/node_modules
+      #     cp -R node_modules/* artifacts/apps/backend-app/node_modules
 
       # 🔹 Pastikan Prisma Client benar-benar ada di artifacts
       - name: Verify Prisma Client
