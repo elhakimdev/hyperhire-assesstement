@@ -37,7 +37,7 @@ jobs:
 
       # 🔹 Install Prisma Client sebelum build
       - name: Install Prisma Client
-        run: pnpm add @prisma/client --filter backend-app
+        run: pnpm install
 
       # 🔹 Generate Prisma Client agar bisa digunakan dalam build
       - name: Generate Prisma Client
@@ -58,19 +58,28 @@ jobs:
           mv -v apps/backend-app/dist artifacts/apps/backend-app
           cp -R prisma artifacts/apps/backend-app/prisma
 
-      # 🔹 Install dependencies production di dalam artifacts (supaya Prisma Client tetap ada)
-      - name: Install Production Dependencies in Artifacts
-        run: |
-          cd artifacts/apps/backend-app
-          pnpm install --prod
+      # # 🔹 Install dependencies production di dalam artifacts (supaya Prisma Client tetap ada)
+      # - name: Install Production Dependencies in Artifacts
+      #   run: |
+      #     cd artifacts/apps/backend-app
+      #     pnpm install --prod
 
-      # 🔹 Copy Prisma Client supaya tetap bisa diakses
+      # - name: Start Backend Server
+      # run: |
+      #   cd artifacts/apps/backend-app
+      #   NODE_PATH=$(pwd)/node_modules node dist/main.js
+
+      # 🔹 Copy Node Modules Ke Backend Artifacts
       - name: Ensure Prisma Client Exists in Artifact
         run: |
           mkdir -p artifacts/apps/backend-app/node_modules
-          cp -R node_modules/.pnpm artifacts/apps/backend-app/
-          cp -R node_modules/@prisma artifacts/apps/backend-app/node_modules/
-          cp -R node_modules/prisma artifacts/apps/backend-app/node_modules/
+          cp -R node_modules/* artifacts/apps/backend-app/node_modules
+
+      # 🔹 Copy Node Modules Ke Frontend Artifacts
+      - name: Ensure Prisma Client Exists in Artifact
+        run: |
+          mkdir -p artifacts/apps/backend-app/node_modules
+          cp -R node_modules/* artifacts/apps/backend-app/node_modules
 
       # 🔹 Pastikan Prisma Client benar-benar ada di artifacts
       - name: Verify Prisma Client
