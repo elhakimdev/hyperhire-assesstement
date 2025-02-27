@@ -36,54 +36,43 @@ jobs:
         run: pnpm exec prisma generate
 
       - name: Cleanup Artifacts
-        run: find . -type d -name "artifacts" -exec rm -rf {} + || true
+        run: rm -rf artifacts || true
 
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
 
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
-          
+
       - name: Move Backend Build Output
         run: |
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
-          mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          mv -v apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
 
-      - name: Install Dependencies in Backend Artifact
+      - name: Move Prisma Client to Backend Artifact
         run: |
-          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
-            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
-            pnpm install --no-frozen-lockfile
-          else
-            echo "Backend artifact directory missing, skipping install!"
-          fi
-      
-      # - name: Move Prisma Client to Backend Artifact
-      #   run: |
-      #     mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
-          
-      #     # Copy the Prisma Client package
-      #     cp -R $GITHUB_WORKSPACE/node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/
-          
-      #     # Ensure .prisma directory is copied (Prisma binary dependencies)
-      #     cp -R $GITHUB_WORKSPACE/node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
-
-      #     # Ensure @prisma/client is also copied from direct node_modules location
-      #     cp -R $GITHUB_WORKSPACE/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma directory found"
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
+          cp -R node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma client found"
+          cp -R node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma
+          cp apps/backend-app/prisma/schema.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/prisma/ || echo "No schema.prisma found"
 
       - name: Regenerate Prisma Client in Backend Artifact
         run: |
-          cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
-          pnpm exec prisma generate
-      
+          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
+            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
+            pnpm exec prisma generate --schema=prisma/schema.prisma
+          else
+            echo "Skipping prisma generate: Backend artifact directory missing!"
+          fi
+
       - name: Move Frontend Build Output
         run: |
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/frontend-app
-          mv -v $GITHUB_WORKSPACE/apps/frontend-app/.next $GITHUB_WORKSPACE/artifacts/apps/frontend-app
-      
-      
-      - name: Check if Artifacts Are Ignored
-        run: git check-ignore -v artifacts/* || echo "Artifacts are NOT ignored"
+          mv -v apps/frontend-app/.next $GITHUB_WORKSPACE/artifacts/apps/frontend-app
+
+      - name: Verify Artifacts Are Not Ignored
+        run: git check-ignore -v $GITHUB_WORKSPACE/artifacts/* || echo "Artifacts are NOT ignored"
 
       - name: List Generated Artifacts
         run: ls -R artifacts || echo "Artifacts folder is empty!"
@@ -97,10 +86,10 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@github.com"
-          
+
           # Ensure artifacts are not ignored
-          git add -f artifacts/
-          
+          git add -f $GITHUB_WORKSPACE/artifacts/ || echo "No artifacts to add"
+
           # Only commit if there are actual changes
           if git diff --cached --quiet; then
             echo "No changes to commit"
