@@ -2,6 +2,7 @@
   "name": "@hyperhire-projects/backend-app",
   "version": "0.0.1",
   "private": true,
+  "packageManager": "pnpm@10.5.2",
   "nx": {
     "name": "backend-app",
     "projectType": "application",
