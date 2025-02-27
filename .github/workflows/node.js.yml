@@ -38,14 +38,14 @@ jobs:
       - name: Create Artifacts Directory
         run: mkdir -p artifacts/apps/frontend-app artifacts/apps/backend-app
       
-      - name: Build backend
+      - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
-        
-      - name: Move Backend Build Output
-        run: mv apps/backend-app/dist artifacts/apps/backend-app
 
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
+      
+      - name: Move Backend Build Output
+        run: mv apps/backend-app/dist artifacts/apps/backend-app
       
       - name: Move Frontend Build Output
         run: mv apps/frontend-app/.next artifacts/apps/frontend-app
