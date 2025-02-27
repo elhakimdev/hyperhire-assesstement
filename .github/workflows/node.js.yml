@@ -32,16 +32,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: List All Artifacts Before Cleanup
-        run: find . -type d -name "artifacts"
+      - name: Cleanup Artifacts
+        run: find . -type d -name "artifacts" -exec rm -rf {} +
 
-      - name: Cleanup Old Artifacts
-        run: |
-          if [ -d "artifacts" ]; then
-            echo "Removing existing artifacts..."
-            rm -rf artifacts
-          fi
-          mkdir -p artifacts/apps
       
       - name: Build backend
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
