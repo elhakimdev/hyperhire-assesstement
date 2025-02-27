@@ -32,11 +32,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
       
-      - name: Build All Projects with Custom Output
-        run: |
-          for project in $(pnpm nx show projects --json | jq -r 'keys[]'); do
-            pnpm nx build $project --outputPath=deployment-artifacts/$project
-          done
+      - name: Build backend
+        run: pnpm exec nx build backend-app --outputh-path=artifacts/app/backend
 
       - name: Commit Built Files
         env:
