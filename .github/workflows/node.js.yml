@@ -1,0 +1,48 @@
+name: Nx CI/CD (pnpm)
+
+on:
+  push:
+    branches:
+      - main  # Change this to your deployment branch
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures proper commit history for Nx caching
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Affected Projects
+        run: pnpm nx affected --target=build --base=origin/main --parallel
+
+      - name: Run Tests (Optional)
+        run: pnpm nx affected --target=test --base=origin/main --parallel
+
+      - name: Lint (Optional)
+        run: pnpm nx affected --target=lint --base=origin/main --parallel
+
+      - name: Commit Built Files
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "ci: auto-commit built files [skip ci]" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"
