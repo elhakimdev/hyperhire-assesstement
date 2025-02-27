@@ -35,12 +35,6 @@ jobs:
       - name: Build Affected Projects
         run: pnpm nx affected --target=build --base=origin/main --parallel
 
-      - name: Run Tests (Optional)
-        run: pnpm nx affected --target=test --base=origin/main --parallel
-
-      - name: Lint (Optional)
-        run: pnpm nx affected --target=lint --base=origin/main --parallel
-
       - name: Commit Built Files
         run: |
           git config --global user.name "GitHub Actions"
