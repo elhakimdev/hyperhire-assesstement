@@ -31,12 +31,23 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Cleanup Old Artifacts
+        run: |
+          if [ -d "artifacts" ]; then
+            echo "Removing existing artifacts..."
+            rm -rf artifacts
+          fi
+          mkdir -p artifacts/app
       
       - name: Build backend
         run: pnpm exec nx build backend-app --output-path=artifacts/app/backend --parallel --skip-nx-cache
 
-      - name: Build backend
-        run: pnpm exec nx build frontend-app --output-path=artifacts/app/frontend --parallel --skip-nx-cache
+      - name: Build Next.js App (SSR)
+        run: pnpm exec nx build frontend-app
+
+      - name: Move Build Output
+        run: mv apps/frontend-app/.next artifacts/app/frontend-app
 
       - name: Commit Built Files
         env:
