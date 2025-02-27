@@ -33,18 +33,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       
       - name: Build Affected Projects with Custom Output
-        run: |
-          AFFECTED_PROJECTS=$(pnpm nx affected --target=build --base=origin/main --plain)
-      
-          if [ -z "$AFFECTED_PROJECTS" ]; then
-            echo "No affected projects to build."
-            exit 0
-          fi
-      
-          for project in $AFFECTED_PROJECTS; do
-            echo "Building $project..."
-            pnpm nx build $project --outputPath=deployment-artifacts/$project
-          done
+        run: pnpm nx affected --target=build --base=origin/main --parallel
 
       - name: Commit Built Files
         env:
