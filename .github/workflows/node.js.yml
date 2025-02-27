@@ -36,9 +36,11 @@ jobs:
         run: pnpm nx affected --target=build --base=origin/main --parallel
 
       - name: Commit Built Files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@github.com"
           git add .
           git commit -m "ci: auto-commit built files [skip ci]" || echo "No changes to commit"
-          git push origin main || echo "No changes to push"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }} || echo "No changes to push"
