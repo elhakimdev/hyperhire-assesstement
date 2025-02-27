@@ -52,6 +52,12 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
           mv -v apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
       
+      - name: Copy Dependencies to Artifacts (Ensure Prisma Client)
+        run: |
+          mkdir -p artifacts/apps/backend-app/node_modules
+          cp -R node_modules/.pnpm artifacts/apps/backend-app/
+          cp -R node_modules/@prisma artifacts/apps/backend-app/node_modules/
+          cp -R node_modules/prisma artifacts/apps/backend-app/node_modules/
       # - name: Install Dependencies in Backend Artifact
       #   run: |
       #     if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
