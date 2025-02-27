@@ -43,6 +43,11 @@ jobs:
 
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
+          
+      - name: Move Backend Build Output
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
+          mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
       
       - name: Move Prisma Client to Backend Artifact
         run: |
@@ -61,11 +66,6 @@ jobs:
         run: |
           cd artifacts/apps/backend-app
           pnpm exec prisma generate
-
-      - name: Move Backend Build Output
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
-          mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
       
       - name: Move Frontend Build Output
         run: |
