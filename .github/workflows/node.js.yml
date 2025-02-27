@@ -64,7 +64,7 @@ jobs:
 
       - name: Regenerate Prisma Client in Backend Artifact
         run: |
-          cd artifacts/apps/backend-app
+          cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
           pnpm exec prisma generate
       
       - name: Move Frontend Build Output
