@@ -56,7 +56,7 @@ jobs:
         run: |
           mkdir -p artifacts/apps/backend-app
           mv -v apps/backend-app/dist artifacts/apps/backend-app
-          cp -R apps/backend-app/prisma artifacts/apps/backend-app/prisma
+          cp -R prisma artifacts/apps/backend-app/prisma
 
       # 🔹 Install dependencies production di dalam artifacts (supaya Prisma Client tetap ada)
       - name: Install Production Dependencies in Artifacts
