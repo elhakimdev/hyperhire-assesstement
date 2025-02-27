@@ -3,7 +3,7 @@ name: Nx CI/CD (pnpm)
 on:
   push:
     branches:
-      - main  # Change this to your deployment branch
+      - main
   pull_request:
     branches:
       - main
@@ -24,8 +24,11 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8  # Use the latest stable PNPM version
+          run_install: false  # Prevent automatic install
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
