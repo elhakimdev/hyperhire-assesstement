@@ -48,19 +48,28 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
           mv -v $GITHUB_WORKSPACE/apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
-      
-      - name: Move Prisma Client to Backend Artifact
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
-          
-          # Copy the Prisma Client package
-          cp -R $GITHUB_WORKSPACE/node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/
-          
-          # Ensure .prisma directory is copied (Prisma binary dependencies)
-          cp -R $GITHUB_WORKSPACE/node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
 
-          # Ensure @prisma/client is also copied from direct node_modules location
-          cp -R $GITHUB_WORKSPACE/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma directory found"
+      - name: Install Dependencies in Backend Artifact
+        run: |
+          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
+            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
+            pnpm install --no-frozen-lockfile
+          else
+            echo "Backend artifact directory missing, skipping install!"
+          fi
+      
+      # - name: Move Prisma Client to Backend Artifact
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
+          
+      #     # Copy the Prisma Client package
+      #     cp -R $GITHUB_WORKSPACE/node_modules/.pnpm/@prisma+client*/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/
+          
+      #     # Ensure .prisma directory is copied (Prisma binary dependencies)
+      #     cp -R $GITHUB_WORKSPACE/node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No .prisma directory found"
+
+      #     # Ensure @prisma/client is also copied from direct node_modules location
+      #     cp -R $GITHUB_WORKSPACE/node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/ || echo "No @prisma directory found"
 
       - name: Regenerate Prisma Client in Backend Artifact
         run: |
