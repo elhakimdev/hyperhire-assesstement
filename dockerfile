@@ -35,7 +35,7 @@ WORKDIR /app
 COPY --from=deps /app/apps/backend-app ./apps/backend-app
 COPY --from=deps /app/prisma ./prisma
 COPY --from=deps /app/package.json ./package.json
-RUN pnpm nx build backend
+RUN pnpm exec nx build backend
 RUN pnpm prisma generate --schema=apps/prisma/schema.prisma
 
 # Stage 3: Build Frontend (Next.js)
@@ -48,7 +48,7 @@ WORKDIR /app
 COPY --from=deps /app/apps/frontend-app ./apps/frontend-app
 COPY --from=deps /app/package.json ./package.json
 
-RUN pnpm nx build frontend
+RUN pnpm exec nx build frontend
 
 # Stage 4: Run Backend (Production)
 FROM base AS backend_runner
