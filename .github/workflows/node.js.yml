@@ -32,11 +32,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Generate Prisma Client
-        run: pnpm exec prisma generate --schema=prisma/schema.prisma
-
       - name: Cleanup Artifacts
         run: rm -rf artifacts || true
+      
+      - name: Install Prisma Client in Backend Before Build
+        run: pnpm add @prisma/client --filter backend-app
+
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate --filter backend-app --schema=prisma/schema.prisma
 
       - name: Build Nest.js App (Backend)
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
@@ -49,25 +52,25 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
           mv -v apps/backend-app/dist $GITHUB_WORKSPACE/artifacts/apps/backend-app
       
-      - name: Install Dependencies in Backend Artifact
-        run: |
-          if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
-            cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
-            pnpm install --no-frozen-lockfile
-          else
-            echo "Backend artifact directory missing, skipping install!"
-          fi
+      # - name: Install Dependencies in Backend Artifact
+      #   run: |
+      #     if [ -d $GITHUB_WORKSPACE/artifacts/apps/backend-app ]; then
+      #       cd $GITHUB_WORKSPACE/artifacts/apps/backend-app
+      #       pnpm install --no-frozen-lockfile
+      #     else
+      #       echo "Backend artifact directory missing, skipping install!"
+      #     fi
       
-      - name: Copy Prisma Schema to Backend Artifact
-        run: |
-          mkdir -p artifacts/apps/backend-app/prisma
-          cp prisma/schema.prisma artifacts/apps/backend-app/prisma/
+      # - name: Copy Prisma Schema to Backend Artifact
+      #   run: |
+      #     mkdir -p artifacts/apps/backend-app/prisma
+      #     cp prisma/schema.prisma artifacts/apps/backend-app/prisma/
       
-      - name: Install Prisma Client in Backend Artifact
-        run: |
-          cd artifacts/apps/backend-app
-          pnpm add @prisma/client --no-workspace-root
-          pnpm exec prisma generate
+      # - name: Install Prisma Client in Backend Artifact
+      #   run: |
+      #     cd artifacts/apps/backend-app
+      #     pnpm add @prisma/client --no-workspace-root
+      #     pnpm exec prisma generate
 
       # - name: Move Prisma Client to Backend Artifact
       #   run: |
