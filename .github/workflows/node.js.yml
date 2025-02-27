@@ -32,6 +32,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate
+
       - name: Cleanup Artifacts
         run: find . -type d -name "artifacts" -exec rm -rf {} + || true
 
@@ -41,6 +44,12 @@ jobs:
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
       
+      - name: Move Prisma Client to Backend Artifact
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules
+          mv node_modules/.prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/
+          mv node_modules/@prisma $GITHUB_WORKSPACE/artifacts/apps/backend-app/node_modules/
+
       - name: Move Backend Build Output
         run: |
           mkdir -p $GITHUB_WORKSPACE/artifacts/apps/backend-app
