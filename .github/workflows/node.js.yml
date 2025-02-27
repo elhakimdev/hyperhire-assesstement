@@ -40,13 +40,13 @@ jobs:
         run: pnpm exec nx build backend-app --parallel --skip-nx-cache
         
       - name: Move Backend Build Output
-        run: mv apps/backend-app/dist artifacts/apps/backend-app
+        run: mkdir -d artifacts/apps/backend-app && mv apps/backend-app/dist artifacts/apps/backend-app
 
       - name: Build Next.js App (SSR)
         run: pnpm exec nx build frontend-app --parallel --skip-nx-cache
       
       - name: Move Frontend Build Output
-        run: mv apps/frontend-app/.next artifacts/apps/frontend-app
+        run: mxdir -d artifacts/apps/backend-app && mv apps/frontend-app/.next artifacts/apps/frontend-app
 
       - name: Commit Built Files
         env:
