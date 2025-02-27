@@ -32,8 +32,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build Affected Projects
-        run: pnpm nx affected --target=build --base=origin/main --parallel
+      - name: Build Affected Projects with Custom Output
+        run: |
+          pnpm nx affected --target=build --base=origin/main --parallel --output-style=stream --skip-nx-cache --exclude=global
+          for project in $(pnpm nx affected --target=build --base=origin/main --plain); do
+            pnpm nx build $project --outputPath=depployment-artifacts/$project
+          done
 
       - name: Commit Built Files
         env:
