@@ -14,11 +14,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
 FROM base AS deps
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy package files first (for better caching)
 COPY pnpm-lock.yaml package.json nx.json .npmrc ./
 
 # Install dependencies only once
 RUN pnpm install --no-frozen-lockfile
+
+# ✅ Install Nx globally to avoid "command not found"
+# RUN pnpm add -g nx 
 
 # Copy the entire monorepo (without reinstalling)
 COPY . .
@@ -26,6 +30,8 @@ COPY . .
 # Stage 2: Build Backend (NestJS)
 FROM base AS backend_builder
 WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy dependencies from deps stage
 # COPY --from=deps /app/node_modules ./node_modules
@@ -41,6 +47,7 @@ RUN pnpm prisma generate --schema=apps/prisma/schema.prisma
 # Stage 3: Build Frontend (Next.js)
 FROM base AS frontend_builder
 WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy dependencies from deps stage
 # COPY --from=deps /app/node_modules ./node_modules
@@ -53,6 +60,7 @@ RUN pnpm exec nx build frontend
 # Stage 4: Run Backend (Production)
 FROM base AS backend_runner
 WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Use volumes instead of copying node_modules
 # VOLUME ["/app/node_modules"]
@@ -68,6 +76,7 @@ COPY --from=backend_builder /app/prisma ./prisma
 # Stage 5: Run Frontend (Production)
 FROM base AS frontend_runner
 WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Use volumes instead of copying node_modules
 # VOLUME ["/app/node_modules"]
