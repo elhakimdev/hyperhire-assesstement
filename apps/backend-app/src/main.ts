@@ -20,7 +20,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   const port = appConfig.port || 8081;
   const host = appConfig.host || 'localhost';
-
+  console.log(appConfig.host, host);
   app.listen(port, host, () => {
     Logger.log(`Listening at http://${host}:${port}/${globalPrefix}`);
   });
