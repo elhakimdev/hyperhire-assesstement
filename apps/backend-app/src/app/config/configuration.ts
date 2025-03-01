@@ -69,10 +69,17 @@ export const parseConfigVars = (object: Record<string, unknown>) => {
 
 
 export default () => {
-  const appConfigPath = join(
-    process.cwd(),
-    'apps/backend-app/src/app/config/application.configuration.yaml'
-  );
+
+  // Detect if running in production (built with Webpack)
+  const isProd = process.env.NEST_APP_ENV === 'production';
+  console.log(isProd);
+
+  const appConfigPath = isProd
+    ? join(__dirname, 'app/config', 'application.configuration.yaml') // Webpack moves files to `dist/`
+    : join(process.cwd(), 'apps/backend-app/src/app/config/application.configuration.yaml'); // Local dev path
+
+  console.log("read configuration from : ", appConfigPath);
+
 
   if (!fs.existsSync(appConfigPath)) {
     throw new Error(`Configuration file not found: ${appConfigPath}`);

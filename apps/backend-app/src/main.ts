@@ -21,8 +21,10 @@ async function bootstrap() {
   const port = appConfig.port || 8081;
   const host = appConfig.host || 'localhost';
 
+  console.log(host, port);
+
   app.listen(port, host, () => {
-    Logger.log(`Listening at http://${host}:${port}/${globalPrefix}`);
+    Logger.log(`Listening at http://${host}:${port}`);
   });
 }
 
