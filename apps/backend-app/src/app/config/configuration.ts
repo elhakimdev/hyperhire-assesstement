@@ -71,7 +71,7 @@ export const parseConfigVars = (object: Record<string, unknown>) => {
 export default () => {
 
   // Detect if running in production (built with Webpack)
-  const isProd = process.env.NEST_APP_ENV === 'production';
+  const isProd = process.env.APP_ENV === 'production';
   console.log(isProd);
 
   const appConfigPath = isProd
