@@ -96,7 +96,7 @@ export default function AddMenuForm({
   console.log(node, parent, formData);
 
   return (
-    <Form onSubmit={handleSubmit} className={'w-2/3'}>
+    <Form onSubmit={handleSubmit} className={'px-[24px] md:px-0 w-full md:w-2/3'}>
       <Field.Root name="rootName" className="flex flex-col items-start gap-1">
         <Field.Label className="text-sm font-medium text-gray-900">
           Root Id
@@ -107,13 +107,13 @@ export default function AddMenuForm({
           value={formData.rootId}
           onChange={handleChange}
           required
-          placeholder="Enter root name"
+          placeholder="Root ID"
           disabled
-          className={"flex h-[52px] min-w-36 w-full items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 "}
+          className={"flex h-[52px] min-w-36 w-full items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-200"}
         />
       </Field.Root>
       
-      <Field.Root name="rootName" className="flex flex-col items-start gap-1">
+      <Field.Root name="rootName" className="flex flex-col items-start gap-1 mt-4">
         <Field.Label className="text-sm font-medium text-gray-900">
           Root Name
         </Field.Label>
@@ -123,9 +123,9 @@ export default function AddMenuForm({
           value={formData.rootName}
           onChange={handleChange}
           required
-          placeholder="Enter root name"
+          placeholder="Root name"
           disabled
-          className={"flex h-[52px] min-w-36 w-full items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 "}
+          className={"flex h-[52px] min-w-36 w-full items-center justify-between gap-3 rounded-md px-[16px] py-[14px] text-base text-gray-900 select-none bg-gray-100 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-800 active:bg-gray-100 data-[popup-open]:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-200"}
         />
       </Field.Root>
 
@@ -153,7 +153,7 @@ export default function AddMenuForm({
         />
       </Field.Root>
 
-      <button disabled={loading} type="submit" className="mt-4 x-[32px] py-[12px] rounded-[48px] bg-[#253BFF] text-white w-full">
+      <button disabled={loading} type="submit" className="flex w-[200px] mb-6 md:mb-0 items-center justify-center md:w-full mt-4 x-[32px] py-[12px] rounded-[48px] bg-[#253BFF] text-white">
         {loading ? "Submitting..." : "Submit"}
       </button>
     </Form>
