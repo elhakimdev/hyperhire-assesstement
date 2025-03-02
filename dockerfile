@@ -1,90 +1,20 @@
-# Base Stage: Common Setup for All Stages
-FROM ubuntu:22.04 AS base
+# Use a lightweight Node.js runtime for production
+FROM node:18 AS nest_backend_runner
+
 WORKDIR /app
 
-# Install curl and required dependencies
-RUN apt update && apt install -y curl git ca-certificates
+# Expose the port used by NestJS
+EXPOSE 8081
 
-# Install latest Node.js and PNPM
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
-    apt install -y nodejs && \
-    corepack enable && corepack prepare pnpm@latest --activate
+# Run the application
+CMD ["node", "backend-app/dist/main.js"]
 
-# Stage 1: Install dependencies (Shared for all apps)
-FROM base AS deps
+FROM node:18 AS next_frontend_runner
+
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-# Copy package files first (for better caching)
-COPY pnpm-lock.yaml package.json nx.json .npmrc ./
+# Expose Next.js port
+EXPOSE 3000
 
-# Install dependencies only once
-RUN pnpm install --no-frozen-lockfile
-
-# ✅ Install Nx globally to avoid "command not found"
-# RUN pnpm add -g nx 
-
-# Copy the entire monorepo (without reinstalling)
-COPY . .
-
-# Stage 2: Build Backend (NestJS)
-FROM base AS backend_builder
-WORKDIR /app
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copy dependencies from deps stage
-# COPY --from=deps /app/node_modules ./node_modules
-
-# Use volumes instead of copying node_modules
-# VOLUME ["/app/node_modules"]
-COPY --from=deps /app/apps/backend-app ./apps/backend-app
-COPY --from=deps /app/prisma ./prisma
-COPY --from=deps /app/package.json ./package.json
-RUN pnpm exec nx build backend
-RUN pnpm prisma generate --schema=apps/prisma/schema.prisma
-
-# Stage 3: Build Frontend (Next.js)
-FROM base AS frontend_builder
-WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copy dependencies from deps stage
-# COPY --from=deps /app/node_modules ./node_modules
-# VOLUME ["/app/node_modules"]
-COPY --from=deps /app/apps/frontend-app ./apps/frontend-app
-COPY --from=deps /app/package.json ./package.json
-
-RUN pnpm exec nx build frontend
-
-# Stage 4: Run Backend (Production)
-FROM base AS backend_runner
-WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Use volumes instead of copying node_modules
-# VOLUME ["/app/node_modules"]
-
-# Copy built backend files
-COPY --from=backend_builder /app/dist/apps/backend-app ./dist/apps/backend-app
-# COPY --from=deps /app/node_modules ./node_modules
-COPY --from=backend_builder /app/prisma ./prisma
-
-# EXPOSE 3001
-# CMD ["node", "dist/apps/backend/main"]
-
-# Stage 5: Run Frontend (Production)
-FROM base AS frontend_runner
-WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Use volumes instead of copying node_modules
-# VOLUME ["/app/node_modules"]
-
-# Copy built frontend files
-COPY --from=frontend_builder /app/dist/apps/frontend/.next ./apps/frontend/.next
-COPY --from=frontend_builder /app/apps/frontend/public ./apps/frontend/public
-# COPY --from=deps /app/node_modules ./node_modules
-
-# EXPOSE 3000
-# CMD ["pnpm", "nx", "serve", "frontend"]
+# Run Next.js
+CMD ["node", "frontend-app/server.js"]
