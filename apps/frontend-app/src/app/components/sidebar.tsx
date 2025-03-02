@@ -39,7 +39,7 @@ const Sidebar = () => {
   return (
     <div
     id="sidebar"
-    className="bg-[#101828] flex flex-col w-[240px] rounded-[24px]"
+    className="bg-[#101828] md:flex flex-col w-[240px] rounded-[24px] hidden"
   >
     <div
       id="sidebar-head"

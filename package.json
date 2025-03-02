@@ -10,6 +10,7 @@
     "@eslint/js": "^9.21.0",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
+    "@next/eslint-plugin-next": "^15.2.0",
     "@nx/devkit": "21.0.0-canary.20250206-8bd0bcd",
     "@nx/eslint": "21.0.0-canary.20250206-8bd0bcd",
     "@nx/eslint-plugin": "21.0.0-canary.20250206-8bd0bcd",

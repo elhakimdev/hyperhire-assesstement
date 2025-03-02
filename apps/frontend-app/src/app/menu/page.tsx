@@ -83,11 +83,11 @@ const MenuPage = forwardRef<MenuPageRef, MenuPageProps>((props, ref) => {
   };
 
   return (
-    <div className="w-full h-full flex flex-row p-[24px]">
+    <div className="w-full h-full flex flex-col md:flex-row md:p-[24px]">
       <Sidebar />
-      <div id="main-content" className='flex flex-col w-1/2'>
+      <div id="main-content" className='flex flex-col md:w-1/2'>
         <Header />
-        <div id="tree-wrapper" className='flex flex-col px-[48px] h-full w-full overflow-hidden'>
+        <div id="tree-wrapper" className='flex flex-col px-[24px] md:px-[48px] h-full w-full overflow-hidden'>
           <div className='pt-[12px] pb-[28px]'>
             <MenuSelect 
               onChange={handleChangeMenu}
@@ -114,7 +114,7 @@ const MenuPage = forwardRef<MenuPageRef, MenuPageProps>((props, ref) => {
           </div>
         </div>
       </div>
-      <div className='flex-1 flex items-center justify-center'>
+      <div className='flex-1 flex items-center justify-center mt-10 md:m-0'>
         <AddMenuForm 
           node={getSelectedNode()}
           parent={selectedNode}

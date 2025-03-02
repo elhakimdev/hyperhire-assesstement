@@ -12,7 +12,7 @@ const Tree = ({ node, expandedNodes, onToggleNode, onCLickAddNode,  ...props }: 
   const isExpanded = expandedNodes.has(node.id);
 
   return (
-    <ul {...props} className="pl-[20px] relative">
+    <ul {...props} className="pl-[10px] md:pl-[20px] relative">
       {/* Root Node */}
       <li className="relative">
         <div className="h-10 flex items-center group hover:cursor-pointer flex-row" onClick={() => onToggleNode(node.id)}>
@@ -45,17 +45,17 @@ const Tree = ({ node, expandedNodes, onToggleNode, onCLickAddNode,  ...props }: 
 
         {/* Children */}
         {isExpanded && Array.isArray(node.children) && node.children.length > 0 && (
-          <ul className="pl-[20px] relative">
+          <ul className="pl-[10px] md:pl-[20px] relative">
             {node.children.map((child, index) => (
               <li key={child.id} className="relative">
                 {/* Vertical line that stops at the last child */}
                 <div
-                  className={`absolute left-[0px] top-0 border-l-[1.5px] border-gray-500 ${index === (node.children?.length ?? 0) - 1 ? "h-[20px]" : "h-full"}`}
+                  className={`absolute left-[8px] md:left-[0px] top-0 border-l-[1.5px] border-gray-500 ${index === (node.children?.length ?? 0) - 1 ? "h-[20px]" : "h-full"}`}
                 />
                 
                 {/* Horizontal line that stops at the last child */}
                 <div
-                  className={`absolute left-[0px] -top-[20px] h-10 border-b-[1.5px] border-gray-500 w-[20px]`}
+                  className={`absolute left-[8px] md:left-[0px] -top-[20px] h-10 border-b-[1.5px] border-gray-500 w-[10px] md:w-[20px]`}
                 />
 
                 {/* Render child node */}
